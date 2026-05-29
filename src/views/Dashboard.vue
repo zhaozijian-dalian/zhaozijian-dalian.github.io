@@ -102,11 +102,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useReportStore } from '../stores/report';
 import * as echarts from 'echarts';
 import type { ECharts } from 'echarts';
 
+const router = useRouter();
 const authStore = useAuthStore();
 const reportStore = useReportStore();
 
@@ -120,24 +122,30 @@ const pendingReports = computed(() => reportStore.reports.slice(0, 5));
 const loading = computed(() => reportStore.loading);
 
 onMounted(async () => {
-  if (!authStore.token) {
+  await checkAuthAndFetch();
+});
+
+const checkAuthAndFetch = async () => {
+  if (!authStore.token || !authStore.user) {
+    router.push('/login');
     return;
   }
   await fetchData();
   initCharts();
-});
+};
 
 const fetchData = async () => {
-  if (!authStore.token) {
-    return;
-  }
   try {
     await Promise.all([
       reportStore.fetchStats(),
       reportStore.fetchReports({ status: 'pending', limit: 5 }),
     ]);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to fetch data:', error);
+    if (error.response?.status === 401) {
+      authStore.logout();
+      router.push('/login');
+    }
   }
 };
 
