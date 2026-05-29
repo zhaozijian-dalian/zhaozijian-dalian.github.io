@@ -102,10 +102,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
+import { useAuthStore } from '../stores/auth';
 import { useReportStore } from '../stores/report';
 import * as echarts from 'echarts';
 import type { ECharts } from 'echarts';
 
+const authStore = useAuthStore();
 const reportStore = useReportStore();
 
 const trendChartRef = ref<HTMLDivElement | null>(null);
@@ -118,11 +120,17 @@ const pendingReports = computed(() => reportStore.reports.slice(0, 5));
 const loading = computed(() => reportStore.loading);
 
 onMounted(async () => {
+  if (!authStore.token) {
+    return;
+  }
   await fetchData();
   initCharts();
 });
 
 const fetchData = async () => {
+  if (!authStore.token) {
+    return;
+  }
   try {
     await Promise.all([
       reportStore.fetchStats(),
