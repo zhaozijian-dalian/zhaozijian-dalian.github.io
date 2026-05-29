@@ -68,13 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { useAuthStore } from '../stores/auth';
+import { login as loginApi } from '../api/auth';
 
-const router = useRouter();
-const authStore = useAuthStore();
 const formRef = ref();
 const loading = ref(false);
 
@@ -92,19 +89,9 @@ const rules = {
   ],
 };
 
-const clearAuthState = () => {
+onMounted(() => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  authStore.token = null;
-  authStore.user = null;
-};
-
-onMounted(() => {
-  clearAuthState();
-});
-
-onUnmounted(() => {
-  clearAuthState();
 });
 
 const handleLogin = async () => {
@@ -114,14 +101,23 @@ const handleLogin = async () => {
     if (valid) {
       loading.value = true;
       try {
-        await authStore.login({
+        const response = await loginApi({
           username: form.username,
           password: form.password,
         });
+        
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
         ElMessage.success('登录成功');
-        router.push('/dashboard');
+        
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 500);
+        
       } catch (error: any) {
-        clearAuthState();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         const message = error.response?.data?.detail || '登录失败，请检查用户名和密码';
         ElMessage.error(message);
       } finally {
