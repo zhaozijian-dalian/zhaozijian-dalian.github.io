@@ -68,7 +68,7 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
-import { ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus/lib/message-box';
 
 const route = useRoute();
 const router = useRouter();
