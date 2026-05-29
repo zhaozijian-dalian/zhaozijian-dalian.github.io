@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from '../stores/auth';
@@ -92,12 +92,19 @@ const rules = {
   ],
 };
 
-onMounted(() => {
-  // 清理旧的登录状态，确保干净的登录环境
+const clearAuthState = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   authStore.token = null;
   authStore.user = null;
+};
+
+onMounted(() => {
+  clearAuthState();
+});
+
+onUnmounted(() => {
+  clearAuthState();
 });
 
 const handleLogin = async () => {
@@ -114,6 +121,7 @@ const handleLogin = async () => {
         ElMessage.success('登录成功');
         router.push('/dashboard');
       } catch (error: any) {
+        clearAuthState();
         const message = error.response?.data?.detail || '登录失败，请检查用户名和密码';
         ElMessage.error(message);
       } finally {

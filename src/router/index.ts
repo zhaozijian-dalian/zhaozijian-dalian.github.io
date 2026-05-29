@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -65,11 +64,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
+  const token = localStorage.getItem('token');
   
-  if (to.meta.requiresAuth !== false && !authStore.token) {
+  if (to.meta.requiresAuth !== false && !token) {
     next('/login');
-  } else if (to.path === '/login' && authStore.token) {
+  } else if (to.path === '/login' && token) {
     next('/dashboard');
   } else {
     next();

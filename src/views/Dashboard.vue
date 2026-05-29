@@ -121,12 +121,16 @@ const stats = computed(() => reportStore.stats);
 const pendingReports = computed(() => reportStore.reports.slice(0, 5));
 const loading = computed(() => reportStore.loading);
 
+const hasToken = () => {
+  return localStorage.getItem('token') !== null;
+};
+
 onMounted(async () => {
   await checkAuthAndFetch();
 });
 
 const checkAuthAndFetch = async () => {
-  if (!authStore.token || !authStore.user) {
+  if (!hasToken()) {
     router.push('/login');
     return;
   }
