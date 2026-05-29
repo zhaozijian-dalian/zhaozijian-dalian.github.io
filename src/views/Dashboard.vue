@@ -143,7 +143,7 @@ const fetchData = async () => {
   } catch (error: any) {
     console.error('Failed to fetch data:', error);
     if (error.response?.status === 401) {
-      authStore.logout();
+      authStore.logoutLocal();
       router.push('/login');
     }
   }

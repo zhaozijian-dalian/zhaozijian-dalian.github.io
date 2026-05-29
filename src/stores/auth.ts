@@ -26,7 +26,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = async () => {
     try {
-      await logoutApi();
+      if (token.value) {
+        await logoutApi();
+      }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -37,6 +39,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  const logoutLocal = () => {
+    token.value = null;
+    user.value = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
+
   const fetchCurrentUser = async () => {
     if (!token.value) return;
     try {
@@ -45,7 +54,7 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('user', JSON.stringify(response.data));
     } catch (error) {
       console.error('Fetch current user error:', error);
-      logout();
+      logoutLocal();
     }
   };
 
@@ -59,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     login,
     logout,
+    logoutLocal,
     fetchCurrentUser,
     hasPermission,
   };
