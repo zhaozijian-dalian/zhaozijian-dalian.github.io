@@ -68,8 +68,6 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
-import { ElMessageBox } from 'element-plus/lib/message-box';
-
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -81,16 +79,9 @@ const hasPermission = (permission: string) => authStore.hasPermission(permission
 
 const handleCommand = async (command: string) => {
   if (command === 'logout') {
-    try {
-      await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      });
+    if (confirm('确定要退出登录吗？')) {
       await authStore.logout();
       router.push('/login');
-    } catch (error) {
-      console.log('取消退出');
     }
   }
 };
