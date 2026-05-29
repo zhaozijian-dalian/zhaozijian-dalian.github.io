@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosError } from 'axios';
 import { ElMessage } from 'element-plus';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const baseURL = '/api';
 
 const api: AxiosInstance = axios.create({
   baseURL,
