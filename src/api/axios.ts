@@ -25,6 +25,8 @@ api.interceptors.request.use(
   }
 );
 
+let isRefreshing = false;
+
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -34,11 +36,12 @@ api.interceptors.response.use(
       const status = error.response.status;
       const data = error.response.data as any;
       
-      if (status === 401) {
+      if (status === 401 && !isRefreshing) {
+        isRefreshing = true;
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         ElMessage.error('登录已过期，请重新登录');
-        window.location.href = '/login';
+        isRefreshing = false;
       } else if (status === 403) {
         ElMessage.error(data.detail || '没有权限执行此操作');
       } else if (status === 404) {

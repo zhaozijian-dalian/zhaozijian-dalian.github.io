@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from '../stores/auth';
@@ -91,6 +91,14 @@ const rules = {
     { required: true, message: '请输入密码', trigger: 'blur' },
   ],
 };
+
+onMounted(() => {
+  // 清理旧的登录状态，确保干净的登录环境
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  authStore.token = null;
+  authStore.user = null;
+});
 
 const handleLogin = async () => {
   if (!formRef.value) return;
